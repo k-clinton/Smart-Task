@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { LogIn, UserPlus, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -49,7 +49,7 @@ export function Auth({ onClose }: AuthProps) {
           <X className="w-5 h-5" />
         </button>
       )}
-      
+
       <h2 className="text-2xl font-bold text-gray-900 mb-6">
         {isSignUp ? 'Create an account' : 'Sign in to your account'}
       </h2>
