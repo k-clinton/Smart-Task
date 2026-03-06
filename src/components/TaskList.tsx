@@ -22,9 +22,9 @@ interface TaskListProps {
 }
 
 const priorityColors = {
-  low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+  low: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800',
+  medium: 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800',
+  high: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800'
 };
 
 function TaskItem({
@@ -64,64 +64,65 @@ function TaskItem({
 
   if (isEditing) {
     return (
-      <div className="flex flex-col gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-blue-200 dark:border-blue-800">
+      <div className="flex flex-col gap-4 glass-card p-5 rounded-3xl border-brand-200 dark:border-brand-800/50 shadow-sm animate-fade-in">
         <input
           type="text"
           value={editTitle}
           onChange={(e) => setEditTitle(e.target.value)}
-          className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-dark-900/50 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
         />
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center bg-gray-50/50 dark:bg-dark-900/30 p-3 rounded-2xl">
           <div className="flex-1 space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Start Date
+            <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">
+              Start Time
             </label>
             <DatePicker
               selected={editStartDate}
               onChange={setEditStartDate}
               showTimeSelect
-              dateFormat="MMMM d, yyyy h:mm aa"
-              className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              dateFormat="MMM d, h:mm aa"
+              className="w-full px-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-500 transition-shadow outline-none"
             />
           </div>
           <div className="flex-1 space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Due Date
+            <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">
+              Deadline
             </label>
             <DatePicker
               selected={editDueDate}
-              onChange={setEditDueDate}
+              onChange={setDueDate}
               showTimeSelect
-              dateFormat="MMMM d, yyyy h:mm aa"
-              className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              dateFormat="MMM d, h:mm aa"
+              className="w-full px-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-500 transition-shadow outline-none"
             />
           </div>
           <div className="flex-1 space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Priority
+            <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">
+              Priority Level
             </label>
             <div className="flex gap-2">
               {(['low', 'medium', 'high'] as const).map((p) => (
                 <button
                   key={p}
                   type="button"
-                  onClick={() => setEditPriority(p)}
-                  className={`flex items-center gap-1 px-3 py-1 rounded-md capitalize ${editPriority === p ? priorityColors[p] : 'bg-gray-100 dark:bg-gray-700'
+                  onClick={() => setEditPriority(editPriority === p ? null : p)}
+                  className={`flex-1 flex justify-center items-center py-2 rounded-xl capitalize text-sm transition-all ${editPriority === p
+                      ? priorityColors[p]
+                      : 'bg-white dark:bg-dark-800 text-gray-500 hover:bg-gray-100 dark:hover:bg-dark-700 border border-gray-200 dark:border-white/10'
                     }`}
                 >
-                  <Flag className={`w-4 h-4 ${editPriority === p ? '' : 'text-gray-500 dark:text-gray-400'}`} />
                   {p}
                 </button>
               ))}
             </div>
           </div>
         </div>
-        <div className="flex justify-end gap-2 mt-2">
-          <button onClick={handleCancel} className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-md dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-1">
+        <div className="flex justify-end gap-3 mt-2">
+          <button onClick={handleCancel} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl dark:text-gray-300 dark:hover:bg-dark-700 flex items-center gap-2 transition-colors">
             <X className="w-4 h-4" /> Cancel
           </button>
-          <button onClick={handleSave} className="px-3 py-1 text-sm bg-blue-500 text-white hover:bg-blue-600 rounded-md flex items-center gap-1">
-            <Save className="w-4 h-4" /> Save
+          <button onClick={handleSave} className="px-5 py-2 text-sm font-medium bg-brand-500 text-white hover:bg-brand-600 rounded-xl flex items-center gap-2 transition-colors shadow-sm">
+            <Save className="w-4 h-4" /> Save Changes
           </button>
         </div>
       </div>
@@ -129,58 +130,63 @@ function TaskItem({
   }
 
   return (
-    <div className="flex items-start gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow group">
+    <div className={`flex items-start gap-4 glass-card p-5 rounded-3xl transition-all duration-300 group border ${task.completed ? 'opacity-75 bg-gray-50/50 dark:bg-dark-900/30' : 'hover:shadow-md hover:border-gray-300 dark:hover:border-white/20'
+      }`}>
       <button
         onClick={() => onToggleTask(task.id, !task.completed)}
-        className="mt-1 text-gray-400 hover:text-blue-500 transition-colors"
+        className="mt-1 text-gray-300 dark:text-gray-600 hover:text-brand-500 transition-colors shrink-0"
       >
         {task.completed ? (
-          <CheckCircle2 className="w-6 h-6 text-green-500" />
+          <CheckCircle2 className="w-6 h-6 text-brand-500" />
         ) : (
           <Circle className="w-6 h-6" />
         )}
       </button>
-      <div className="flex-1">
-        <div className="flex items-center gap-3">
-          <p className={`text-lg transition-all duration-300 ${task.completed ? 'line-through text-gray-500 dark:text-gray-400 opacity-60' : 'text-gray-900 dark:text-gray-100'}`}>
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-3">
+          <p className={`text-lg font-medium transition-all duration-300 truncate ${task.completed ? 'line-through text-gray-500 dark:text-gray-500' : 'text-gray-900 dark:text-gray-100'
+            }`}>
             {task.title}
           </p>
           {task.priority && (
-            <span className={`px-2 py-1 rounded-md text-xs font-medium capitalize ${priorityColors[task.priority]}`}>
+            <span className={`px-2.5 py-0.5 rounded-lg text-xs font-semibold capitalize tracking-wide shrink-0 ${priorityColors[task.priority]}`}>
               {task.priority}
             </span>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
-          <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            <span>Created: {format(new Date(task.created_at), 'MMM d, yyyy')}</span>
+        <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-dark-900/50 px-2.5 py-1 rounded-lg">
+            <Clock className="w-3.5 h-3.5" />
+            <span>Created {format(new Date(task.created_at), 'MMM d, yyyy')}</span>
           </div>
           {task.start_date && (
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4 text-blue-500" />
-              <span>Starts: {format(new Date(task.start_date), 'MMM d, yyyy h:mm a')}</span>
+            <div className="flex items-center gap-1.5 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-400 px-2.5 py-1 rounded-lg border border-brand-100 dark:border-brand-900/30">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Starts {format(new Date(task.start_date), 'MMM d, h:mm a')}</span>
             </div>
           )}
           {task.due_date && (
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4 text-red-500" />
-              <span>Due: {format(new Date(task.due_date), 'MMM d, yyyy h:mm a')}</span>
+            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${task.completed
+                ? 'bg-gray-100 dark:bg-dark-900/50 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400'
+                : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-100 dark:border-red-900/30'
+              }`}>
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Due {format(new Date(task.due_date), 'MMM d, h:mm a')}</span>
             </div>
           )}
         </div>
       </div>
-      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
         <button
           onClick={() => setIsEditing(true)}
-          className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md transition-colors"
+          className="p-2.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:text-brand-400 dark:hover:bg-dark-700 rounded-xl transition-colors"
           title="Edit"
         >
           <Edit2 className="w-4 h-4" />
         </button>
         <button
           onClick={() => onDeleteTask(task.id)}
-          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-700 rounded-md transition-colors"
+          className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-dark-700 rounded-xl transition-colors"
           title="Delete"
         >
           <Trash2 className="w-4 h-4" />
@@ -192,7 +198,7 @@ function TaskItem({
 
 export function TaskList({ tasks, onToggleTask, onDeleteTask, onUpdateTask }: TaskListProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 empty:hidden">
       {tasks.map((task) => (
         <TaskItem
           key={task.id}
