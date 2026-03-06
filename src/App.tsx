@@ -19,12 +19,12 @@ export interface Task {
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  
+
   // Filter & Search & Sort states
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'created_at' | 'due_date' | 'priority'>('created_at');
-  
+
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -112,7 +112,7 @@ function App() {
 
   // 1. Search filter
   if (searchQuery.trim()) {
-    processedTasks = processedTasks.filter(t => 
+    processedTasks = processedTasks.filter(t =>
       t.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }
@@ -177,25 +177,24 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto p-6 space-y-8 animate-fade-in">
+      <main className="max-w-5xl mx-auto p-6 space-y-8 animate-fade-in relative z-0">
         {/* Animated task input form */}
-        <section className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <section className="animate-slide-up relative z-50" style={{ animationDelay: '0.1s' }}>
           <TaskInput onAddTask={addTask} />
         </section>
 
         {/* Toolbar: Search, Filter, Sort */}
-        <section className="flex flex-col md:flex-row items-center justify-between gap-4 glass-card p-2 rounded-2xl animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          
+        <section className="flex flex-col md:flex-row items-center justify-between gap-4 glass-card p-2 rounded-2xl animate-slide-up relative z-10" style={{ animationDelay: '0.2s' }}>
+
           <div className="flex bg-gray-100/50 dark:bg-dark-900/50 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
             {['all', 'active', 'completed'].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f as any)}
-                className={`px-5 py-2 rounded-lg transition-all duration-200 text-sm font-medium capitalize ${
-                  filter === f
+                className={`px-5 py-2 rounded-lg transition-all duration-200 text-sm font-medium capitalize ${filter === f
                     ? 'bg-white dark:bg-dark-800 text-brand-600 dark:text-brand-400 shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-dark-800/50'
-                }`}
+                  }`}
               >
                 {f}
               </button>
@@ -213,7 +212,7 @@ function App() {
                 className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-dark-900 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-500 transition-shadow appearance-none"
               />
             </div>
-            
+
             <div className="relative shrink-0">
               <select
                 value={sortBy}
@@ -240,7 +239,7 @@ function App() {
                 {searchQuery ? "No matching tasks found" : "You're all caught up!"}
               </h3>
               <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
-                {searchQuery 
+                {searchQuery
                   ? "Try adjusting your search or filters to find what you're looking for."
                   : "Add some new tasks above to get started with your day."}
               </p>
@@ -251,9 +250,9 @@ function App() {
             </div>
           )}
 
-          <TaskList 
-            tasks={processedTasks} 
-            onToggleTask={toggleTask} 
+          <TaskList
+            tasks={processedTasks}
+            onToggleTask={toggleTask}
             onDeleteTask={deleteTask}
             onUpdateTask={updateTask}
           />
