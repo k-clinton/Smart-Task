@@ -74,14 +74,36 @@ function App() {
 
   async function addTask(taskData: Omit<Task, 'id' | 'created_at'>) {
     if (!user?.id) return;
+    
+    // Create an optimistic id
+    const optimisticTask: Task = {
+      ...taskData,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+    };
+    
+    // Optimistic update
+    setTasks(prev => [optimisticTask, ...prev]);
+
     const { error } = await supabase.from('tasks').insert([{ ...taskData, user_id: user.id }]);
-    if (error) { console.error('Error adding task:', error); return; }
+    if (error) { 
+      console.error('Error adding task:', error); 
+      setTasks(prev => prev.filter(t => t.id !== optimisticTask.id)); // Revert on error
+      return; 
+    }
     fetchTasks();
   }
 
   async function updateTask(id: string, updates: Partial<Task>) {
+    // Optimistic update
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
+
     const { error } = await supabase.from('tasks').update(updates).eq('id', id);
-    if (error) { console.error('Error updating task:', error); return; }
+    if (error) { 
+      console.error('Error updating task:', error); 
+      fetchTasks(); // Revert on error if needed
+      return; 
+    }
     fetchTasks();
   }
 
@@ -90,8 +112,15 @@ function App() {
   }
 
   async function deleteTask(id: string) {
+    // Optimistic update
+    setTasks(prev => prev.filter(t => t.id !== id));
+
     const { error } = await supabase.from('tasks').delete().eq('id', id);
-    if (error) { console.error('Error deleting task:', error); return; }
+    if (error) { 
+      console.error('Error deleting task:', error); 
+      fetchTasks(); // Revert on error
+      return; 
+    }
     fetchTasks();
   }
 
