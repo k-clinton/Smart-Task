@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Calendar, CheckCircle2, Circle, Clock, Flag, Trash2, Edit2, Save, X } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar, CheckCircle2, Circle, Clock, Trash2, Edit2, Save, X } from 'lucide-react';
 import { format } from 'date-fns';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -90,7 +90,7 @@ function TaskItem({
             </label>
             <DatePicker
               selected={editDueDate}
-              onChange={setDueDate}
+              onChange={setEditDueDate}
               showTimeSelect
               dateFormat="MMM d, h:mm aa"
               className="w-full px-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-500 transition-shadow outline-none"
@@ -133,6 +133,7 @@ function TaskItem({
     <div className={`flex items-start gap-4 glass-card p-5 rounded-3xl transition-all duration-300 group border ${task.completed ? 'opacity-75 bg-gray-50/50 dark:bg-dark-900/30' : 'hover:shadow-md hover:border-gray-300 dark:hover:border-white/20'
       }`}>
       <button
+        type="button"
         onClick={() => onToggleTask(task.id, !task.completed)}
         className="mt-1 text-gray-300 dark:text-gray-600 hover:text-brand-500 transition-colors shrink-0"
       >

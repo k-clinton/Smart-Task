@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrainCog, LogOut, Moon, Sun, Search, ListFilter } from 'lucide-react';
 import { TaskList } from './components/TaskList';
 import { TaskInput } from './components/TaskInput';
@@ -85,13 +85,22 @@ function App() {
     // Optimistic update
     setTasks(prev => [optimisticTask, ...prev]);
 
-    const { error } = await supabase.from('tasks').insert([{ ...taskData, user_id: user.id }]);
+    const { data, error } = await supabase
+      .from('tasks')
+      .insert([{ ...taskData, user_id: user.id }])
+      .select()
+      .single();
+
     if (error) { 
       console.error('Error adding task:', error); 
       setTasks(prev => prev.filter(t => t.id !== optimisticTask.id)); // Revert on error
       return; 
     }
-    fetchTasks();
+
+    if (data) {
+      // Replace optimistic task with the real one from DB
+      setTasks(prev => prev.map(t => t.id === optimisticTask.id ? data : t));
+    }
   }
 
   async function updateTask(id: string, updates: Partial<Task>) {
