@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, Calendar, Flag } from 'lucide-react';
+import { Send, Calendar } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -45,9 +45,9 @@ export function TaskInput({ onAddTask }: TaskInputProps) {
   };
 
   return (
-    <div className="glass-card rounded-3xl p-4 w-full">
+    <div className="glass-card rounded-3xl p-4 w-full relative z-20">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 relative z-20">
           <input
             type="text"
             value={title}
@@ -58,11 +58,10 @@ export function TaskInput({ onAddTask }: TaskInputProps) {
           <button
             type="button"
             onClick={() => setShowDates(!showDates)}
-            className={`px-4 py-3 rounded-2xl transition-all flex items-center justify-center ${
-              showDates 
-                ? 'bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400' 
-                : 'text-gray-400 hover:text-brand-500 hover:bg-gray-50 dark:hover:bg-dark-800'
-            }`}
+            className={`px-4 py-3 rounded-2xl transition-all flex items-center justify-center ${showDates
+              ? 'bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400'
+              : 'text-gray-400 hover:text-brand-500 hover:bg-gray-50 dark:hover:bg-dark-800'
+              }`}
           >
             <Calendar className="w-5 h-5" />
           </button>
@@ -76,34 +75,42 @@ export function TaskInput({ onAddTask }: TaskInputProps) {
         </div>
 
         {showDates && (
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center animate-fade-in p-2 bg-gray-50/50 dark:bg-dark-900/30 rounded-2xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center animate-fade-in p-2 bg-gray-50/50 dark:bg-dark-900/30 rounded-2xl relative z-50">
             <div className="flex-1 space-y-2">
               <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">
                 Start Time
               </label>
-              <DatePicker
-                selected={startDate}
-                onChange={setStartDate}
-                showTimeSelect
-                dateFormat="MMM d, h:mm aa"
-                placeholderText="Select start"
-                className="w-full px-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-500 transition-shadow outline-none"
-              />
+              <div className="relative">
+                <DatePicker
+                  selected={startDate}
+                  onChange={setStartDate}
+                  showTimeSelect
+                  dateFormat="MMM d, h:mm aa"
+                  placeholderText="Select start"
+                  className="w-full px-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-500 transition-shadow outline-none"
+                  popperClassName="z-[100]"
+                  popperPlacement="bottom-start"
+                />
+              </div>
             </div>
             <div className="flex-1 space-y-2">
               <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">
                 Deadline
               </label>
-              <DatePicker
-                selected={dueDate}
-                onChange={setDueDate}
-                showTimeSelect
-                dateFormat="MMM d, h:mm aa"
-                placeholderText="Select due date"
-                className="w-full px-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-500 transition-shadow outline-none"
-              />
+              <div className="relative">
+                <DatePicker
+                  selected={dueDate}
+                  onChange={setDueDate}
+                  showTimeSelect
+                  dateFormat="MMM d, h:mm aa"
+                  placeholderText="Select due date"
+                  className="w-full px-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-500 transition-shadow outline-none"
+                  popperClassName="z-[100]"
+                  popperPlacement="bottom-start"
+                />
+              </div>
             </div>
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 space-y-2 relative z-10">
               <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">
                 Priority Level
               </label>
@@ -113,11 +120,10 @@ export function TaskInput({ onAddTask }: TaskInputProps) {
                     key={p}
                     type="button"
                     onClick={() => setPriority(priority === p ? null : p)}
-                    className={`flex-1 flex justify-center items-center py-2 rounded-xl capitalize text-sm transition-all ${
-                      priority === p 
-                      ? priorityColors[p] 
+                    className={`flex-1 flex justify-center items-center py-2 rounded-xl capitalize text-sm transition-all ${priority === p
+                      ? priorityColors[p]
                       : 'bg-white dark:bg-dark-800 text-gray-500 hover:bg-gray-100 dark:hover:bg-dark-700 border border-gray-200 dark:border-white/10'
-                    }`}
+                      }`}
                   >
                     {p}
                   </button>
