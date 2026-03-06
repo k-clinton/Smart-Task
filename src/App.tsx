@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { BrainCog, LogOut, Moon, Sun } from 'lucide-react';
+import { BrainCog, LogOut, Moon, Sun, Filter } from 'lucide-react';
 import { TaskList } from './components/TaskList';
 import { TaskInput } from './components/TaskInput';
 import { Auth } from './components/Auth';
 import { supabase } from './lib/supabase';
+import { User } from '@supabase/supabase-js';
 
-interface Task {
+export interface Task {
   id: string;
   title: string;
   completed: boolean;
@@ -17,7 +18,8 @@ interface Task {
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -31,14 +33,14 @@ function App() {
   useEffect(() => {
     const getCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      setUserId(user?.id || null);
+      setUser(user);
     };
 
     getCurrentUser();
     fetchTasks();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user.id || null);
+      setUser(session?.user || null);
       if (session?.user.id) {
         fetchTasks();
       } else {
@@ -66,7 +68,7 @@ function App() {
   }
 
   async function addTask(taskData: Omit<Task, 'id' | 'created_at'>) {
-    if (!userId) {
+    if (!user?.id) {
       console.error('User not authenticated');
       return;
     }
@@ -75,7 +77,7 @@ function App() {
       .from('tasks')
       .insert([{ 
         ...taskData,
-        user_id: userId 
+        user_id: user.id 
       }]);
 
     if (error) {
@@ -86,14 +88,32 @@ function App() {
     fetchTasks();
   }
 
-  async function toggleTask(id: string, completed: boolean) {
+  async function updateTask(id: string, updates: Partial<Task>) {
     const { error } = await supabase
       .from('tasks')
-      .update({ completed })
+      .update(updates)
       .eq('id', id);
 
     if (error) {
       console.error('Error updating task:', error);
+      return;
+    }
+
+    fetchTasks();
+  }
+
+  async function toggleTask(id: string, completed: boolean) {
+    await updateTask(id, { completed });
+  }
+
+  async function deleteTask(id: string) {
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting task:', error);
       return;
     }
 
@@ -107,7 +127,7 @@ function App() {
     }
   }
 
-  if (!userId) {
+  if (!user?.id) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
         <Auth />
@@ -115,15 +135,24 @@ function App() {
     );
   }
 
+  const filteredTasks = tasks.filter(t => {
+    if (filter === 'active') return !t.completed;
+    if (filter === 'completed') return t.completed;
+    return true;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <div className="max-w-4xl mx-auto p-6">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
           <div className="flex items-center gap-4">
             <BrainCog className="w-10 h-10 text-blue-500" />
             <h1 className="text-3xl font-bold">SmartTask</h1>
           </div>
           <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline-block">
+              {user.email}
+            </span>
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -143,7 +172,39 @@ function App() {
 
         <div className="space-y-6">
           <TaskInput onAddTask={addTask} />
-          <TaskList tasks={tasks} onToggleTask={toggleTask} />
+          
+          <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-4 py-2 rounded-md transition-colors text-sm font-medium ${filter === 'all' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilter('active')}
+                className={`px-4 py-2 rounded-md transition-colors text-sm font-medium ${filter === 'active' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+              >
+                Active
+              </button>
+              <button
+                onClick={() => setFilter('completed')}
+                className={`px-4 py-2 rounded-md transition-colors text-sm font-medium ${filter === 'completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+              >
+                Completed
+              </button>
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 px-4">
+              {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
+            </div>
+          </div>
+
+          <TaskList 
+            tasks={filteredTasks} 
+            onToggleTask={toggleTask} 
+            onDeleteTask={deleteTask}
+            onUpdateTask={updateTask}
+          />
         </div>
       </div>
     </div>
